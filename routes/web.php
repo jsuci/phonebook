@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PhonebookController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
@@ -14,13 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('phonebook');
-});
+Route::get('/', [PhonebookController::class, 'index']);
 
-Route::get('/listings', function () {
-    return view('listings', [
-        'heading' => 'Latest Listings',
-        'listings' => User::all()
-    ]);
-});
+Route::get('/providers/{id}', [PhonebookController::class, 'show']);

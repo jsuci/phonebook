@@ -47,19 +47,9 @@
               <button type="button" class="btn btn-block btn-outline-secondary" id="subEdit">Edit</button>
               <button type="button" class="btn btn-block btn-outline-secondary" id="subDelete">Delete</button>
               <button type="button" class="btn btn-block btn-outline-secondary" id="subProviders">Providers</button>
-              {{-- <button type="button" class="btn btn-block btn-outline-secondary" id="subLog">Log</button> --}}
+
             </div>
 
-
-            {{-- <div class="subHead pt-3">
-              Users
-            </div>
-            <button type="button" class="btn btn-block btn-outline-secondary" id="userPanel">Panel</button>
-
-            <div class="subHead pt-3">
-              Report
-            </div>
-            <button type="button" class="btn btn-block btn-outline-secondary" id="listSub">List of Subscriber</button> --}}
         </div>
 
         <div class="col-sm-8 p-5 rightSide">
@@ -88,48 +78,21 @@
                 </tr>
               </thead>
               <tbody>
-                <tr data-id='sb1'>
-                  <td>Doe</th>
-                  <td>John</td>
-                  <td>Otto</td>
-                  <td>MALE</td>
-                  <td>Cagayan de Oro City</td>
-                </tr>
-                <tr data-id='sb2'>
-                  <td>Lopez</th>
-                  <td>Lorenzo</td>
-                  <td>Ruiz</td>
-                  <td>MALE</td>
-                  <td>Cagayan de Oro City</td>
-                </tr>
-                <tr data-id='sb3'>
-                  <td>Person2</th>
-                  <td>Person2</td>
-                  <td>Person2</td>
-                  <td>FEMALE</td>
-                  <td>Macasandig</td>
-                </tr>
-                <tr data-id='sb4'>
-                  <td>Person2</th>
-                  <td>Person2</td>
-                  <td>Person2</td>
-                  <td>FEMALE</td>
-                  <td>Macasandig</td>
-                </tr>
-                <tr data-id='sb5'>
-                  <td>Person2</th>
-                  <td>Person2</td>
-                  <td>Person2</td>
-                  <td>FEMALE</td>
-                  <td>Macasandig</td>
-                </tr>
-                <tr data-id='sb6'>
-                  <td>Person2</th>
-                  <td>Person2</td>
-                  <td>Person2</td>
-                  <td>FEMALE</td>
-                  <td>Macasandig</td>
-                </tr>
+                @foreach ($subscribers as $subscriber)
+                  <tr data-id='sb{{ $subscriber->id }}' class="subscriber-row">
+                    <td>{{ $subscriber->lastname }}</th>
+                    <td>{{ $subscriber->firstname }}</td>
+                    <td>{{ $subscriber->middlename }}</td>
+                    <td>
+                      @if ($subscriber->gender === 'M')
+                        MALE
+                      @elseif ($subscriber->gender === 'F')
+                        FEMALE
+                      @endif
+                    </td>
+                    <td>{{ $subscriber->address }}</td>
+                  </tr>
+                @endforeach
               </tbody>
             </table>
           </div>
@@ -214,25 +177,6 @@
           </div>
 
           <div class="modal-body">
-            <h2>Doe, John</h2>
-            <table class="table pt-3" id="providerTable">
-              <thead class="thead-light">
-                <tr>
-                  <th scope="col">PROVIDER</th>
-                  <th scope="col">PHONE NO</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr data-id="pr1">
-                  <td>TM</th>
-                  <td>0975-423-8175</td>
-                </tr>
-                <tr data-id="pr2">
-                  <td>SMART</th>
-                  <td>0975-423-8175</td>
-                </tr>
-              </tbody>
-            </table>
           </div>
 
           <div class="modal-footer">
@@ -252,7 +196,7 @@
 
     <!-- Add Provider and Phone No. -->
     <div class="modal fade" id="addProviderPhone" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
+      <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Add Provider and Phone Number</h5>
@@ -300,12 +244,15 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.js" integrity="sha512-nO7wgHUoWPYGCNriyGzcFwPSF+bPDOR+NvtOYy2wMcWkrnCNPKBcFEkU80XIN14UVja0Gdnff9EmydyLlOL7mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
   
     <!-- Custom JS Script -->
     <script>
+
+      var selectedId = null;
+
       function getSelectedRows() {
         // Get selected row IDs
         var selectedRows = [];
@@ -386,9 +333,15 @@
 
       // providers button
       $( "#subProviders" ).click(function() {
-        // alert( "Providers button clicked" );
-        var selectedRows = getSelectedRows();
-        viewSelectedRowProviders(selectedRows)
+        // Send an AJAX request to retrieve the providers for this subscriber
+        $.ajax({
+          url: '/providers/' + selectedId,
+          success: function(data) {
+            // Display the providers in a modal
+            $('#providers').modal('show');
+            $('#providers .modal-body').html(data);
+          }
+        });
       });
 
       // prevButton
@@ -407,22 +360,40 @@
       $( "tr" ).on('click', function() {
         $("tr").removeClass('table-primary');
         $(this).toggleClass('table-primary');
+
+        selectedId = $(this).data('id').replace('sb', '');
       });
 
       // double click rows
+      // $( "tr" ).dblclick(function() {
+      //   $("tr").removeClass('table-primary');
+      //   $(this).toggleClass('table-primary');
+
+      //   var selectedRows = getSelectedRows();
+
+      //   if (selectedRows[0].includes('sb')) {
+      //     viewSelectedRowProviders(selectedRows);
+      //   } else {
+      //     console.log(this)
+      //   }
+
+      // });
+
       $( "tr" ).dblclick(function() {
-        $("tr").removeClass('table-primary');
-        $(this).toggleClass('table-primary');
+          $("tr").removeClass('table-primary');
+          $(this).toggleClass('table-primary');
 
-        var selectedRows = getSelectedRows();
+          // Send an AJAX request to retrieve the providers for this subscriber
+          $.ajax({
+            url: '/providers/' + selectedId,
+            success: function(data) {
+              // Display the providers in a modal
+              $('#providers').modal('show');
+              $('#providers .modal-body').html(data);
+            }
+          });
 
-        if (selectedRows[0].includes('sb')) {
-          viewSelectedRowProviders(selectedRows);
-        } else {
-          console.log(this)
-        }
-
-      });
+        });
 
       // save new subscriber
       $( "#saveSubscriber" ).click(function() {
