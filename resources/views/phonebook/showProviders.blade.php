@@ -12,10 +12,27 @@
     </thead>
     <tbody>
         @foreach ($data['providers'] as $provider)
-            <tr data-id="{{ $provider->id }}">
+            <tr data-id="{{ $provider->id }}" class="provider-row">
                 <td>{{ $provider->phoneno }}</th>
                 <td>{{ $provider->provider }}</td>
             </tr>
         @endforeach
     </tbody>
 </table>
+
+
+<script>
+
+    var selectedRowId = null;
+
+    $('.provider-row').click(function() {
+        $('tr').removeClass('table-primary');
+        $(this).toggleClass('table-primary');
+
+        selectedRowId = $(this).data('id');
+
+        console.log(selectedRowId)
+    });
+
+
+</script>

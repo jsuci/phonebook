@@ -36,7 +36,7 @@ class PhonebookController extends Controller
     }
 
     public function showSubscribers() {
-        // Retrieve data from the two tables
+
         $subscribers = DB::table('subscribers')
                 ->where('deleted', 0)
                 ->orderBy('updateddatetime', 'desc')
@@ -47,38 +47,45 @@ class PhonebookController extends Controller
         ]);
     }
 
+
     public function storeSubscriber(Request $request)
     {
-        // // Validate the form data
-        // $validatedData = $request->validate([
-        //     'firstname' => 'required',
-        //     'middlename' => 'required',
-        //     'lastname' => 'required',
-        //     'gender' => 'required',
-        //     'address' => 'required',
-        //     // Add any other validation rules you need
-        // ]);
-    
-        // // Create a new subscriber using the validated form data
-        // DB::table('subscribers')->insert([
-        //     'firstname' => $validatedData['firstname'],
-        //     'middlename' => $validatedData['middlename'],
-        //     'lastname' => $validatedData['lastname'],
-        //     'gender' => $validatedData['gender'],
-        //     'address' => $validatedData['address'],
-        // ]);
-
-        DB::table('subscribers')->insert([
-            'firstname' => $request->firstname,
-            'middlename' => $request->middlename,
-            'lastname' => $request->lastname,
-            'gender' => $request->gender,
-            'address' => $request->address,
-            'createddatetime' => $request->createddatetime,
-            'updateddatetime' => $request->updateddatetime,
-        ]);
-    
-        // Redirect back to the home page and show a success message
-        return redirect('/')->with('status', 'Subscriber added successfully!');
+        $subscriber = DB::table('subscribers')
+                        ->where('firstname', $request->firstname)
+                        ->where('middlename', $request->middlename)
+                        ->where('lastname', $request->lastname)
+                        ->first();
+                        
+        if ($subscriber) {
+            // If a subscriber with the same name already exists, update its delete column to 0
+            DB::table('subscribers')
+                ->where('id', $subscriber->id)
+                ->update(['deleted' => 0]);
+            
+            // Redirect back to the home page and show a success message
+            return redirect('/')->with('status', 'Existing subscriber updated successfully!');
+        } else {
+            // If no subscriber with the same name exists, insert a new subscriber into the database
+            DB::table('subscribers')->insert([
+                'firstname' => $request->firstname,
+                'middlename' => $request->middlename,
+                'lastname' => $request->lastname,
+                'gender' => $request->gender,
+                'address' => $request->address,
+                'createddatetime' => $request->createddatetime,
+                'updateddatetime' => $request->updateddatetime,
+            ]);
+        
+            // Redirect back to the home page and show a success message
+            return redirect('/')->with('status', 'New subscriber added successfully!');
+        }
     }
+    
+
+
+    public function deleteSubscriber($id) {
+        DB::table('subscribers')->where('id', $id)->update(['deleted' => 1]);
+        return redirect('/')->with('status', 'Subscriber deleted successfully!');
+    }
+
 }

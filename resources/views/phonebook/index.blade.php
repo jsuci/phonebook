@@ -51,11 +51,9 @@
             </div>
 
             <div class="pt-5">
-              @if(session('status'))
-                <div class="alert alert-success">
+              <div class="alert" style="display: none;">
                   {{ session('status') }}
-                </div>
-              @endif
+              </div>
             </div>
 
 
@@ -206,43 +204,26 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            <form>
-              <div class="form-group">
-                <label for="provider">Provider:</label>
-                <input type="text" class="form-control" id="provider" placeholder="Enter provider name">
-              </div>
-              <div class="form-group">
-                <label for="phone">Phone Number:</label>
-                <input type="tel" class="form-control" id="phone" placeholder="Enter phone number">
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="saveAddProviderPhone">Save</button>
-          </div>
+          <form id="addProviderPhoneForm">
+            @csrf
+            <div class="modal-body">
+                <div class="form-group">
+                  <label for="provider">Provider:</label>
+                  <input type="text" class="form-control" id="provider" placeholder="Enter provider name" name="provider">
+                </div>
+                <div class="form-group">
+                  <label for="phone">Phone Number:</label>
+                  <input type="tel" class="form-control" id="phone" placeholder="Enter phone number" name="phoneno">
+                </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-
-    <div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" id="myModalLabel">Warning</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          </div>
-          <div class="modal-body">
-            <p>Please select a user first.</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -261,7 +242,6 @@
           }
         });
 
-        
         var now = new Date();
         var formattedDateTime = now.toISOString().slice(0, 19).replace('T', ' ');
 
@@ -287,7 +267,8 @@
         var selectedRows = getSelectedRows();
 
         if (selectedRows.length == 0) {
-          $( "#warningModal" ).modal('show');
+          // $( "#warningModal" ).modal('show');
+          notificationToast('alert-danger', 'Please select a subscriber')
         } else {
           // only edit if selectedRows is 1 else
           // give warning to user
@@ -298,19 +279,6 @@
           } else {
             alert('You can only edit one row at a time');
           }
-        }
-      }
-
-      function deleteSelectedRow() {
-
-        var selectedRows = getSelectedRows();
-
-        if (selectedRows.length == 0) {
-          $( "#warningModal" ).modal('show');
-        } else {
-          selectedRows.forEach(function(selectedRow) {
-            console.log('You are deleting', selectedRow);
-          });
         }
       }
 
@@ -336,33 +304,22 @@
         }
       }
 
+      function notificationToast(className, textToDisplay) {
+        var alertBox = $('.alert');
+        alertBox.addClass(className);
+        alertBox.text(textToDisplay);
+        alertBox.fadeIn();
+        setTimeout(function() {
+          alertBox.fadeOut();
+          alertBox.removeClass(className);
+        }, 3000);
+        
+      }
+
       // edit button
       $( "#subEdit" ).click(function() {
         // alert( "Edit button clicked." );
         editSelectedRow();
-      });
-
-      // delete button
-      $( "#subDelete" ).click(function() {
-        // alert( "Delete button clicked." );
-        deleteSelectedRow();
-      });
-
-      // providers button
-      $( "#subProviders" ).click(function() {
-        // if (selectedId) {
-        //   // Send an AJAX request to retrieve the providers for this subscriber
-        //   $.ajax({
-        //     url: '/providers/' + selectedId,
-        //     success: function(data) {
-        //       // Display the providers in a modal
-        //       $('#providers').modal('show');
-        //       $('#providers .modal-body').html(data);
-        //     }
-        //   });
-        // } else {
-        //   $( "#warningModal" ).modal('show');
-        // }
       });
 
       // prevButton
@@ -384,14 +341,6 @@
         console.log( "Provider save button clicked. Reload page via AJAX" );
       });
 
-      // add provider button
-      $( "#saveAddProviderPhone" ).click(function() {
-        alert("Save provider phone number clicked.")
-        // as soon as this button is clicked
-        // make two request to database, one is for storing the new entry
-        // the other is retrieving and displaying the new entry to the database
-
-      });
 
       $( "#deleteProviderBtn" ).click(function() {
         console.log('Delete provider button clicked');
@@ -417,8 +366,20 @@
         --}}
       });
 
+      
+    // add provider button
+    $("#addProviderPhoneForm").submit(function(event) {
+        // Prevent the form from being submitted via the default method
+        event.preventDefault();
+        
+        // Serialize the form data into a query string
+        var formData = $(this).serialize();
+        
+        console.log(formData)
+    });
+
       // new subscriber form submit
-      $("#newSubscriberForm").submit(function(event){
+      $("#newSubscriberForm").submit(function(event) {
         // Prevent the form from being submitted via the default method
         event.preventDefault();
 
@@ -436,7 +397,7 @@
           },
           error: function(xhr) {
             $('#addSubscribers').modal('hide');
-            console.log('error adding subscriber');
+            notificationToast('alert-danger', 'Error adding new subscriber')
           }
         }).then(function() {
           $.ajax({

@@ -55,7 +55,37 @@
             }
         });
         } else {
-        $( "#warningModal" ).modal('show');
+            notificationToast('alert-danger', 'Please select a subscriber')
+        }
+    });
+
+    // delete subscriber button
+    $( "#subDelete" ).click(function() {
+        if (selectedId) {
+            // Send an AJAX request to retrieve the providers for this subscriber
+            $.ajax({
+                url: '/delete-subscriber/' + selectedId,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}' // Add the CSRF token to the data
+                },
+                success: function(data) {
+                    notificationToast('alert-success', 'Subscriber deleted successfully!')
+                }
+            }).then(function() {
+                $.ajax({
+                    type: "GET",
+                    url: "/subscribers",
+                    success: function(data) {
+                    $('#subscriberTable > tbody').html(data);
+                    },
+                    error: function(xhr) {
+                    console.log(xhr.responseText);
+                    }
+                });
+            });
+        } else {
+            notificationToast('alert-danger', 'Please select a subscriber')
         }
     });
 </script>
