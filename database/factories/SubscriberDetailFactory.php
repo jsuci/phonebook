@@ -23,7 +23,7 @@ class SubscriberDetailFactory extends Factory
             },
             'phoneno' => $this->faker->phoneNumber(),
             'provider' => $this->faker->randomElement(['SMART', 'TM', 'GLOBE']),
-            'deleted' => $this->faker->boolean(10),
+            'deleted' => $this->faker->boolean(),
         ];
     }
 }

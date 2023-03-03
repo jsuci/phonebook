@@ -3,6 +3,7 @@
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -47,8 +48,16 @@
               <button type="button" class="btn btn-block btn-outline-secondary" id="subEdit">Edit</button>
               <button type="button" class="btn btn-block btn-outline-secondary" id="subDelete">Delete</button>
               <button type="button" class="btn btn-block btn-outline-secondary" id="subProviders">Providers</button>
-
             </div>
+
+            <div class="pt-5">
+              @if(session('status'))
+                <div class="alert alert-success">
+                  {{ session('status') }}
+                </div>
+              @endif
+            </div>
+
 
         </div>
 
@@ -78,21 +87,6 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($subscribers as $subscriber)
-                  <tr data-id='sb{{ $subscriber->id }}' class="subscriber-row">
-                    <td>{{ $subscriber->lastname }}</th>
-                    <td>{{ $subscriber->firstname }}</td>
-                    <td>{{ $subscriber->middlename }}</td>
-                    <td>
-                      @if ($subscriber->gender === 'M')
-                        MALE
-                      @elseif ($subscriber->gender === 'F')
-                        FEMALE
-                      @endif
-                    </td>
-                    <td>{{ $subscriber->address }}</td>
-                  </tr>
-                @endforeach
               </tbody>
             </table>
           </div>
@@ -101,6 +95,8 @@
         </div>
       </div>
     </div>
+
+    <!-- Toast -->
 
     <!-- Modals -->
 
@@ -114,26 +110,28 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
+          <form id="newSubscriberForm" action="/add-subscriber" method="POST">
+            @csrf
           <div class="modal-body">
-            <form>
+            
               <div class="form-group row">
                 <label for="inputFirstName" class="col-sm-3 col-form-label">First Name</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="inputFirstName">
+                  <input type="text" class="form-control" id="inputFirstName" name="firstname">
                 </div>
               </div>
               
               <div class="form-group row">
                 <label for="inputMiddleName" class="col-sm-3 col-form-label">Middle Name</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="inputMiddleName">
+                  <input type="text" class="form-control" id="inputMiddleName" name="middlename">
                 </div>
               </div>
 
               <div class="form-group row">
                 <label for="inputLastName" class="col-sm-3 col-form-label">Last Name</label>
                 <div class="col-sm-9">
-                  <input type="text" class="form-control" id="inputLastName">
+                  <input type="text" class="form-control" id="inputLastName" name="lastname">
                 </div>
               </div>
 
@@ -145,22 +143,26 @@
                     <option>MALE</option>
                     <option>FEMALE</option>
                   </select>
+                  <input type="hidden" id="gender-input" name="gender" value="">
                 </div>
               </div>
 
               <div class="form-group row">
                 <label for="inputAddress" class="col-sm-3 col-form-label">Address</label>
                 <div class="col-sm-9">
-                  <textarea class="form-control" id="inputAddress" rows="6"></textarea>
+                  <textarea class="form-control" id="inputAddress" rows="6" name="address"></textarea>
                 </div>
               </div>
-
-            </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="saveSubscriber">Save changes</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
+
+          <input type="hidden" id="createddatetime" name="createddatetime" value="">
+          <input type="hidden" id="updateddatetime" name="updateddatetime" value="">
+
+        </form>
         </div>
       </div>
     </div>
@@ -251,7 +253,22 @@
     <!-- Custom JS Script -->
     <script>
 
-      var selectedId = null;
+      $(document).ready(function() {
+        $.ajax({
+          url: '/subscribers',
+          success: function(data) {
+            $('#subscriberTable > tbody').html(data);
+          }
+        });
+
+        
+        var now = new Date();
+        var formattedDateTime = now.toISOString().slice(0, 19).replace('T', ' ');
+
+        $('#createddatetime').val(formattedDateTime);
+        $('#updateddatetime').val(formattedDateTime);
+
+      });
 
       function getSelectedRows() {
         // Get selected row IDs
@@ -333,15 +350,19 @@
 
       // providers button
       $( "#subProviders" ).click(function() {
-        // Send an AJAX request to retrieve the providers for this subscriber
-        $.ajax({
-          url: '/providers/' + selectedId,
-          success: function(data) {
-            // Display the providers in a modal
-            $('#providers').modal('show');
-            $('#providers .modal-body').html(data);
-          }
-        });
+        // if (selectedId) {
+        //   // Send an AJAX request to retrieve the providers for this subscriber
+        //   $.ajax({
+        //     url: '/providers/' + selectedId,
+        //     success: function(data) {
+        //       // Display the providers in a modal
+        //       $('#providers').modal('show');
+        //       $('#providers .modal-body').html(data);
+        //     }
+        //   });
+        // } else {
+        //   $( "#warningModal" ).modal('show');
+        // }
       });
 
       // prevButton
@@ -356,50 +377,6 @@
         alert( "Next button clicked." );
       });
 
-      // toggle selected rows
-      $( "tr" ).on('click', function() {
-        $("tr").removeClass('table-primary');
-        $(this).toggleClass('table-primary');
-
-        selectedId = $(this).data('id').replace('sb', '');
-      });
-
-      // double click rows
-      // $( "tr" ).dblclick(function() {
-      //   $("tr").removeClass('table-primary');
-      //   $(this).toggleClass('table-primary');
-
-      //   var selectedRows = getSelectedRows();
-
-      //   if (selectedRows[0].includes('sb')) {
-      //     viewSelectedRowProviders(selectedRows);
-      //   } else {
-      //     console.log(this)
-      //   }
-
-      // });
-
-      $( "tr" ).dblclick(function() {
-          $("tr").removeClass('table-primary');
-          $(this).toggleClass('table-primary');
-
-          // Send an AJAX request to retrieve the providers for this subscriber
-          $.ajax({
-            url: '/providers/' + selectedId,
-            success: function(data) {
-              // Display the providers in a modal
-              $('#providers').modal('show');
-              $('#providers .modal-body').html(data);
-            }
-          });
-
-        });
-
-      // save new subscriber
-      $( "#saveSubscriber" ).click(function() {
-        $( "#addSubscribers" ).modal('hide');
-        console.log( "Add subscriber save button clicked. Reload page via AJAX" );
-      });
 
       // save new provider
       $( "#saveProvider" ).click(function() {
@@ -438,6 +415,55 @@
             }
           });
         --}}
+      });
+
+      // new subscriber form submit
+      $("#newSubscriberForm").submit(function(event){
+        // Prevent the form from being submitted via the default method
+        event.preventDefault();
+
+        // Serialize the form data into a query string
+        var formData = $(this).serialize();
+
+        console.log(formData)
+
+        $.ajax({
+          url: $(this).attr('action'),
+          type: $(this).attr('method'),
+          data: formData,
+          success: function(response) {
+            $('#addSubscribers').modal('hide');
+          },
+          error: function(xhr) {
+            $('#addSubscribers').modal('hide');
+            console.log('error adding subscriber');
+          }
+        }).then(function() {
+          $.ajax({
+            type: "GET",
+            url: "/subscribers",
+            success: function(data) {
+              $('#subscriberTable > tbody').html(data);
+            },
+            error: function(xhr) {
+              console.log(xhr.responseText);
+            }
+          });
+        });
+
+      });
+
+
+      $('#inputGender').change(function() {
+        // Get the selected value
+        var selectedValue = $(this).val();
+        
+        // Set the value of the hidden input field based on the selected value
+        if (selectedValue === 'MALE') {
+          $('#gender-input').val('M');
+        } else if (selectedValue === 'FEMALE') {
+          $('#gender-input').val('F');
+        }
       });
 
     </script>

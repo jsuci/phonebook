@@ -24,6 +24,9 @@ return new class extends Migration
             ->references('id')
             ->on('subscribers')
             ->onDelete('restrict');
+
+            // Add a unique index
+            $table->unique(['phoneno', 'provider']);
         });
     }
 

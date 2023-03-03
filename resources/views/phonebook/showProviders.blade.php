@@ -12,7 +12,7 @@
     </thead>
     <tbody>
         @foreach ($data['providers'] as $provider)
-            <tr data-id="pr{{ $provider->id }}">
+            <tr data-id="{{ $provider->id }}">
                 <td>{{ $provider->phoneno }}</th>
                 <td>{{ $provider->provider }}</td>
             </tr>

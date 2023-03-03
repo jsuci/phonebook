@@ -26,7 +26,7 @@ class SubscriberFactory extends Factory
             'createddatetime' => $this->faker->dateTimeBetween('-1 year', 'now'),
             'deletedatetime' => $this->faker->optional()->dateTimeBetween('-1 year', 'now'),
             'updateddatetime' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'deleted' => $this->faker->boolean(10),
+            'deleted' => $this->faker->boolean(),
         ];
     }
 }

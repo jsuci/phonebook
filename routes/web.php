@@ -17,4 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PhonebookController::class, 'index']);
 
-Route::get('/providers/{id}', [PhonebookController::class, 'show']);
+Route::get('/providers/{id}', [PhonebookController::class, 'showProviders']);
+
+Route::get('/subscribers', [PhonebookController::class, 'showSubscribers']);
+
+Route::post('/add-subscriber', [PhonebookController::class, 'storeSubscriber']);

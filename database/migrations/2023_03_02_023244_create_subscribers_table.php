@@ -23,6 +23,9 @@ return new class extends Migration
             $table->boolean('deleted')->default(false);
             $table->id();
             $table->timestamps();
+
+            // Add a unique index to the firstname, middlename, and lastname columns
+            $table->unique(['lastname', 'firstname', 'middlename']);
         });
     }
 
