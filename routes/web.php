@@ -21,6 +21,14 @@ Route::get('/providers/{id}', [PhonebookController::class, 'showProviders']);
 
 Route::get('/subscribers', [PhonebookController::class, 'showSubscribers']);
 
+Route::get('/search', [PhonebookController::class, 'searchSubscriber']);
+
 Route::post('/add-subscriber', [PhonebookController::class, 'storeSubscriber']);
 
+Route::post('/add-provider', [PhonebookController::class, 'storeProvider']);
+
+Route::post('/update-subscriber/{id}', [PhonebookController::class, 'updateSubscriber']);
+
 Route::post('/delete-subscriber/{id}', [PhonebookController::class, 'deleteSubscriber']);
+
+Route::post('/delete-provider/{id}', [PhonebookController::class, 'deleteProvider']);

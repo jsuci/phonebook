@@ -21,7 +21,11 @@ class PhonebookController extends Controller
         $subscriber = DB::table('subscribers')->where('id', $id)->where('deleted', 0)->first();
 
         // Retrieve all the providers linked to the subscriber
-        $providers = DB::table('subscriber_details')->where('headerid', $id)->where('deleted', 0)->get();
+        $providers = DB::table('subscriber_details')
+                ->where('headerid', $id)
+                ->where('deleted', 0)
+                ->orderBy('updated_at', 'desc')
+                ->get();
 
 
         // Pass the data to the view
@@ -60,7 +64,11 @@ class PhonebookController extends Controller
             // If a subscriber with the same name already exists, update its delete column to 0
             DB::table('subscribers')
                 ->where('id', $subscriber->id)
-                ->update(['deleted' => 0]);
+                ->update([
+                    'deleted' => 0,
+                    'updateddatetime' => now(),
+                    'updated_at' => now()
+                ]);
             
             // Redirect back to the home page and show a success message
             return redirect('/')->with('status', 'Existing subscriber updated successfully!');
@@ -72,20 +80,110 @@ class PhonebookController extends Controller
                 'lastname' => $request->lastname,
                 'gender' => $request->gender,
                 'address' => $request->address,
-                'createddatetime' => $request->createddatetime,
-                'updateddatetime' => $request->updateddatetime,
+                'createddatetime' => now(),
+                'updateddatetime' => now(),
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
         
             // Redirect back to the home page and show a success message
             return redirect('/')->with('status', 'New subscriber added successfully!');
         }
     }
+
+
+    public function storeProvider(Request $request)
+    {
+        $subscriber_detail = DB::table('subscriber_details')
+                        ->where('headerid', $request->headerid)
+                        ->where('phoneno', $request->phoneno)
+                        ->where('provider', $request->provider)
+                        ->first();
+                        
+        if ($subscriber_detail) {
+            // If a subscriber with the same name already exists, update its delete column to 0
+            DB::table('subscriber_details')
+                ->where('id', $subscriber_detail->id)
+                ->update([
+                    'deleted' => 0,
+                    'updated_at' => now()
+                ]);
+            
+            // Redirect back to the home page and show a success message
+            return redirect('/')->with('status', 'Existing provider updated successfully!');
+        } else {
+            // If no subscriber with the same name exists, insert a new subscriber into the database
+            DB::table('subscriber_details')->insert([
+                'headerid' => $request->headerid,
+                'phoneno' => $request->phoneno,
+                'provider' => $request->provider,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        
+            // Redirect back to the home page and show a success message
+            return redirect('/')->with('status', 'New provider added successfully!');
+        }
+    }
+
+
+
+    public function searchSubscriber(Request $request)
+    {
+        $searchValue = $request->input('search');
+    
+        $subscribers = DB::table('subscribers')
+                        ->where(function($query) use($searchValue) {
+                            $query
+                            ->where('firstname', 'LIKE', '%'.$searchValue.'%')
+                            ->orWhere('lastname', 'LIKE', '%'.$searchValue.'%')
+                            ->orWhere('middlename', 'LIKE', '%'.$searchValue.'%')
+                            ->orWhere('gender', 'LIKE', '%'.$searchValue.'%')
+                            ->orWhere('address', 'LIKE', '%'.$searchValue.'%');
+                        })
+                        ->orderBy('id', 'DESC')
+                        ->get();
+    
+        return view('phonebook.showSubscribers', ['subscribers' => $subscribers]);
+    }
+
+
+    public function updateSubscriber(Request $request, $id)
+    {
+        $subscriber = DB::table('subscribers')->where('id', $id)->first();
+    
+        DB::table('subscribers')
+            ->where('id', $id)
+            ->update([
+                'lastname' => $request->input('lastname'),
+                'firstname' => $request->input('firstname'),
+                'middlename' => $request->input('middlename'),
+                'gender' => $request->input('gender'),
+                'address' => $request->input('address'),
+                'updated_at' => now()
+            ]);
+    
+        return redirect('/')->with('status', 'Subscriber updated successfully!');
+    }
+
     
 
 
     public function deleteSubscriber($id) {
-        DB::table('subscribers')->where('id', $id)->update(['deleted' => 1]);
+        DB::table('subscribers')->where('id', $id)->update([
+            'deleted' => 1,
+            'deletedatetime' => now(),
+            'updateddatetime' => now()
+        ]);
         return redirect('/')->with('status', 'Subscriber deleted successfully!');
+    }
+
+    public function deleteProvider($id) {
+        DB::table('subscriber_details')->where('id', $id)->update([
+            'deleted' => 1,
+            'updated_at' => now()
+        ]);
+        return redirect('/')->with('status', 'Provider deleted successfully!');
     }
 
 }

@@ -31,8 +31,45 @@
 
         selectedRowId = $(this).data('id');
 
-        console.log(selectedRowId)
+        console.log(selectedRowId, selectedId)
+        
     });
 
+    // // delete provider button
+    // $('#deleteProviderBtn').click(function() {
+    //     $('tr').removeClass('table-primary');
+    //     $(this).toggleClass('table-primary');
+
+    //     console.log(selectedRowId, selectedId)
+
+    //     if (selectedRowId) {
+    //         // Send an AJAX request to retrieve the providers for this subscriber
+    //         $.ajax({
+    //             url: '/delete-provider/' + selectedRowId,
+    //             type: 'POST',
+    //             data: {
+    //                 _token: '{{ csrf_token() }}' // Add the CSRF token to the data
+    //             },
+    //             success: function(data) {
+    //                 notificationToast('alert-success', 'Provider deleted successfully!')
+    //             }
+    //         }).then(function() {
+    //             $.ajax({
+    //                 type: "GET",
+    //                 url: '/providers/' + selectedId,
+    //                 success: function(data) {
+    //                     $('#providers .modal-body').html(data);
+    //                 },
+    //                 error: function(xhr) {
+    //                     console.log(xhr.responseText);
+    //                 }
+    //             });
+    //         });
+    //     } else {
+    //         notificationToast('alert-danger', 'Please select a Provider')
+    //     }
+        
+    // });
+    
 
 </script>

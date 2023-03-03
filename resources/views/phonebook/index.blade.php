@@ -204,7 +204,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form id="addProviderPhoneForm">
+          <form id="addProviderPhoneForm" action="/add-provider" method="POST">
             @csrf
             <div class="modal-body">
                 <div class="form-group">
@@ -220,6 +220,8 @@
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               <button type="submit" class="btn btn-primary">Save</button>
             </div>
+
+            <input type="hidden" id="headerid" name="headerid" value="">
           </form>
         </div>
       </div>
@@ -242,67 +244,7 @@
           }
         });
 
-        var now = new Date();
-        var formattedDateTime = now.toISOString().slice(0, 19).replace('T', ' ');
-
-        $('#createddatetime').val(formattedDateTime);
-        $('#updateddatetime').val(formattedDateTime);
-
       });
-
-      function getSelectedRows() {
-        // Get selected row IDs
-        var selectedRows = [];
-        $('.table-primary').each(function(index) {
-          var rowId = $(this).data('id');
-          selectedRows.push(rowId);
-        });
-
-        // console.log(selectedRows);
-        return selectedRows
-      }
-
-      function editSelectedRow() {
-
-        var selectedRows = getSelectedRows();
-
-        if (selectedRows.length == 0) {
-          // $( "#warningModal" ).modal('show');
-          notificationToast('alert-danger', 'Please select a subscriber')
-        } else {
-          // only edit if selectedRows is 1 else
-          // give warning to user
-          if (selectedRows.length == 1) {
-            selectedRows.forEach(function(selectedRow) {
-              console.log('You are editing', selectedRow);
-            });
-          } else {
-            alert('You can only edit one row at a time');
-          }
-        }
-      }
-
-      function viewSelectedRowProviders(selectedRows) {
-
-        if (selectedRows.length == 0) {
-          $( "#warningModal" ).modal('show');
-        } else {
-
-        // as soon as the client clicks on a selected row
-        // change also the content of the providers modal via AJAX
-        // after changing the 
-
-
-          if (selectedRows.length == 1) {
-            selectedRows.forEach(function(selectedRow) {
-              console.log('You are viewing providers for', selectedRow);
-              $( "#providers" ).modal('show');
-            });
-          } else {
-            alert('You can only view providers one row at a time');
-          }
-        }
-      }
 
       function notificationToast(className, textToDisplay) {
         var alertBox = $('.alert');
@@ -316,57 +258,148 @@
         
       }
 
-      // edit button
-      $( "#subEdit" ).click(function() {
-        // alert( "Edit button clicked." );
-        editSelectedRow();
-      });
-
-      // prevButton
-      $( "#prevButton" ).click(function() {
-        // alert( "Previous button clicked." );
-        alert( "Previous button clicked." );
-      });
-
-      // nextButton
-      $( "#nextButton" ).click(function() {
-        // alert( "Next button clicked." );
-        alert( "Next button clicked." );
-      });
-
-
-      // save new provider
-      $( "#saveProvider" ).click(function() {
-        $( "#providers" ).modal('hide');
-        console.log( "Provider save button clicked. Reload page via AJAX" );
-      });
-
-
-      $( "#deleteProviderBtn" ).click(function() {
-        console.log('Delete provider button clicked');
-      });
-
-      // Detect changes to the search input field
-      $('#searchPerson').on('input', function() {
-        var searchValue = $(this).val();
-
-        console.log(searchValue);
-
-        {{-- 
-          Send AJAX request to fetch filtered data
-          $.ajax({
-            url: '{{ route("search") }}',
-            type: 'GET',
-            data: { search: searchValue },
-            success: function(response) {
-              // Insert search results into table body
-              $('#searchPerson').html(response);
-            }
-          });
-        --}}
-      });
-
       
+
+    // edit button
+    $( "#subEdit" ).click(function() {
+
+      var selectedRow = $('.subscriber-row[data-id="' + selectedId + '"]');
+
+      if (selectedId) {
+        console.log(selectedId)
+
+        // Make the row editable
+        selectedRow.find('td').attr('contenteditable', true);
+        selectedRow.removeClass('table-primary');
+        selectedRow.addClass('table-warning');
+        
+
+        selectedRow.find('td').on('keydown', function(e) {
+          if (e.which === 13) {
+              // User pressed the "Enter" key, save changes and make row uneditable
+              var lastname = selectedRow.find('td:nth-child(1)').text().trim();
+              var firstname = selectedRow.find('td:nth-child(2)').text().trim();
+              var middlename = selectedRow.find('td:nth-child(3)').text().trim();
+              var gender = selectedRow.find('td:nth-child(4)').text().trim();
+              var address = selectedRow.find('td:nth-child(5)').text().trim();
+
+              // Set the value of the hidden input field based on the selected value
+              if (gender === 'MALE') {
+                gender = 'M'
+              } else if (gender === 'FEMALE') {
+                gender = 'F'
+              }
+
+              // Call AJAX to save data
+              $.ajax({
+                  url: '/update-subscriber/' + selectedId,
+                  type: 'POST',
+                  data: {
+                      lastname: lastname,
+                      firstname: firstname,
+                      middlename: middlename,
+                      gender: gender,
+                      address: address,
+                      _token: '{{ csrf_token() }}'
+                  },
+                  success: function(response) {
+                      // Show success message
+                      notificationToast('alert-success', 'Subscriber updated successfully!')
+                      console.log(response);
+                  },
+                  error: function(response) {
+                      // Show error message
+                      console.log(response);
+                      notificationToast('alert-danger', 'Error updating subsciber')
+                  }
+              });
+
+              // Make the row non-editable
+              selectedRow.find('td').attr('contenteditable', false);
+              selectedRow.removeClass('table-warning');
+
+              // Remove the "contenteditable" attribute from the row's cells
+              selectedRow.find('td').removeAttr('contenteditable');
+
+              console.log(lastname, firstname)
+          }
+        });
+
+
+
+        } else {
+            notificationToast('alert-danger', 'Please select a subscriber')
+        }
+    });
+
+    // prevButton
+    $( "#prevButton" ).click(function() {
+      // alert( "Previous button clicked." );
+      alert( "Previous button clicked." );
+    });
+
+    // nextButton
+    $( "#nextButton" ).click(function() {
+      // alert( "Next button clicked." );
+      alert( "Next button clicked." );
+    });
+
+
+    // Detect changes to the search input field
+    $('#searchPerson').on('input', function() {
+      var searchValue = $(this).val();
+
+      console.log(searchValue);
+
+      // Send AJAX request to fetch filtered data
+      $.ajax({
+        url: '/search',
+        type: 'GET',
+        data: { search: searchValue },
+        success: function(response) {
+          // Insert search results into table body
+          $('#subscriberTable > tbody').html(response);
+        }
+      });
+    });
+
+    // new subscriber form submit
+    $("#newSubscriberForm").submit(function(event) {
+    // Prevent the form from being submitted via the default method
+    event.preventDefault();
+
+    // Serialize the form data into a query string
+    var formData = $(this).serialize();
+
+    console.log(formData)
+
+        $.ajax({
+            url: $(this).attr('action'),
+            type: $(this).attr('method'),
+            data: formData,
+            success: function(response) {
+                $('#addSubscribers').modal('hide');
+                notificationToast('alert-success', 'Subscriber added successfully!')
+            },
+            error: function(xhr) {
+                $('#addSubscribers').modal('hide');
+                notificationToast('alert-danger', 'Error adding new subscriber')
+            }
+        }).then(function() {
+            $.ajax({
+            type: "GET",
+            url: "/subscribers",
+            success: function(data) {
+                $('#subscriberTable > tbody').html(data);
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+            }
+            });
+        });
+    });
+
+
     // add provider button
     $("#addProviderPhoneForm").submit(function(event) {
         // Prevent the form from being submitted via the default method
@@ -376,43 +409,122 @@
         var formData = $(this).serialize();
         
         console.log(formData)
-    });
+        console.log(selectedId)
 
-      // new subscriber form submit
-      $("#newSubscriberForm").submit(function(event) {
-        // Prevent the form from being submitted via the default method
-        event.preventDefault();
-
-        // Serialize the form data into a query string
-        var formData = $(this).serialize();
-
-        console.log(formData)
 
         $.ajax({
-          url: $(this).attr('action'),
-          type: $(this).attr('method'),
-          data: formData,
-          success: function(response) {
-            $('#addSubscribers').modal('hide');
-          },
-          error: function(xhr) {
-            $('#addSubscribers').modal('hide');
-            notificationToast('alert-danger', 'Error adding new subscriber')
-          }
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: formData,
+        success: function(response) {
+            $('#addProviderPhone').modal('hide');
+            notificationToast('alert-success', 'Provider added successfully!')
+        },
+        error: function(xhr) {
+            $('#addProviderPhone').modal('hide');
+            notificationToast('alert-danger', 'Error adding new provider')
+        }
         }).then(function() {
-          $.ajax({
-            type: "GET",
-            url: "/subscribers",
-            success: function(data) {
-              $('#subscriberTable > tbody').html(data);
-            },
-            error: function(xhr) {
-              console.log(xhr.responseText);
-            }
-          });
+            $.ajax({
+                type: "GET",
+                url: '/providers/' + selectedId,
+                success: function(data) {
+                    $('#providers .modal-body').html(data);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
         });
+    });
 
-      });
+    // providers button
+    $( "#subProviders" ).click(function() {
+        $('#headerid').val(selectedId);
+
+        if (selectedId) {
+        // Send an AJAX request to retrieve the providers for this subscriber
+        $.ajax({
+            url: '/providers/' + selectedId,
+            success: function(data) {
+            // Display the providers in a modal
+            $('#providers').modal('show');
+            $('#providers .modal-body').html(data);
+            }
+        });
+        } else {
+            notificationToast('alert-danger', 'Please select a subscriber')
+        }
+    });
+
+
+    // delete subscriber button
+    $( "#subDelete" ).click(function() {
+        if (selectedId) {
+            // Send an AJAX request to retrieve the providers for this subscriber
+            $.ajax({
+                url: '/delete-subscriber/' + selectedId,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}' // Add the CSRF token to the data
+                },
+                success: function(data) {
+                    notificationToast('alert-success', 'Subscriber deleted successfully!')
+                }
+            }).then(function() {
+                $.ajax({
+                    type: "GET",
+                    url: "/subscribers",
+                    success: function(data) {
+                    $('#subscriberTable > tbody').html(data);
+                    },
+                    error: function(xhr) {
+                    console.log(xhr.responseText);
+                    }
+                });
+            });
+        } else {
+            notificationToast('alert-danger', 'Please select a subscriber')
+        }
+    });
+
+
+
+    // delete provider button
+    $('#deleteProviderBtn').click(function() {
+        $('tr').removeClass('table-primary');
+        $(this).toggleClass('table-primary');
+
+        console.log(selectedRowId, selectedId)
+
+        if (selectedRowId) {
+            // Send an AJAX request to retrieve the providers for this subscriber
+            $.ajax({
+                url: '/delete-provider/' + selectedRowId,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}' // Add the CSRF token to the data
+                },
+                success: function(data) {
+                    notificationToast('alert-success', 'Provider deleted successfully!')
+                }
+            }).then(function() {
+                $.ajax({
+                    type: "GET",
+                    url: '/providers/' + selectedId,
+                    success: function(data) {
+                        $('#providers .modal-body').html(data);
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        } else {
+            notificationToast('alert-danger', 'Please select a Provider')
+        }
+        
+    });
 
 
       $('#inputGender').change(function() {
