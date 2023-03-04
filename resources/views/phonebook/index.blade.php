@@ -341,9 +341,9 @@
       var $link = $(this);
       var url = $link.attr('href');
     
-      if ($link.attr('rel') == 'prev') {
-          url = $('.pagination .page-item.active .page-link').attr('href');
-      }
+      // if ($link.attr('rel') == 'prev') {
+      //     url = $('.pagination .page-item.active .page-link').attr('href');
+      // }
 
       console.log(url)
     
@@ -352,11 +352,6 @@
           dataType: 'html',
           success: function(data) {
             $('.phoneBook').html(data);
-              // var $newEntries = $(data).find('.entry');
-              // $('.entries').replaceWith($newEntries);
-              
-              // var $newPagination = $(data).find('.pagination');
-              // $('.pagination').replaceWith($newPagination);
           }
       });
     });
