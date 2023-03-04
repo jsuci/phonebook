@@ -50,7 +50,7 @@
 
         selectedId = $(this).data('id');
 
-        console.log(selectedId)
+        // console.log(selectedId)
 
         // Send an AJAX request to retrieve the providers for this subscriber
         $.ajax({

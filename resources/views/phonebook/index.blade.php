@@ -267,7 +267,7 @@
       var selectedRow = $('.subscriber-row[data-id="' + selectedId + '"]');
 
       if (selectedId) {
-        console.log(selectedId)
+        // console.log(selectedId)
 
         // Make the row editable
         selectedRow.find('td').attr('contenteditable', true);
@@ -276,7 +276,7 @@
         
 
         selectedRow.find('td').on('keydown', function(e) {
-          if (e.which === 13) {
+          if (e.which === 13 || event.which === 27) {
               // User pressed the "Enter" key, save changes and make row uneditable
               var lastname = selectedRow.find('td:nth-child(1)').text().trim();
               var firstname = selectedRow.find('td:nth-child(2)').text().trim();
@@ -306,11 +306,11 @@
                   success: function(response) {
                       // Show success message
                       notificationToast('alert-success', 'Subscriber updated successfully!')
-                      console.log(response);
+                      console.log('Subscriber updated successfully!');
                   },
                   error: function(response) {
                       // Show error message
-                      console.log(response);
+                      console.log('Error updating subsciber');
                       notificationToast('alert-danger', 'Error updating subsciber')
                   }
               });
@@ -322,7 +322,7 @@
               // Remove the "contenteditable" attribute from the row's cells
               selectedRow.find('td').removeAttr('contenteditable');
 
-              console.log(lastname, firstname)
+              // console.log(lastname, firstname)
           }
         });
 
@@ -345,7 +345,7 @@
           url = $('.pagination .page-item.active .page-link').attr('href');
       }
 
-      console.log(url)
+      // console.log(url)
     
       $.ajax({
           url: url,
@@ -365,7 +365,7 @@
     $('#searchPerson').on('input', function() {
       var searchValue = $(this).val();
 
-      console.log(searchValue);
+      // console.log(searchValue);
 
       // Send AJAX request to fetch filtered data
       $.ajax({
@@ -387,7 +387,7 @@
     // Serialize the form data into a query string
     var formData = $(this).serialize();
 
-    console.log(formData)
+    // console.log(formData)
 
         $.ajax({
             url: $(this).attr('action'),
@@ -512,7 +512,7 @@
         $('tr').removeClass('table-primary');
         $(this).toggleClass('table-primary');
 
-        console.log(selectedRowId, selectedId)
+        // console.log(selectedRowId, selectedId)
 
         if (selectedRowId) {
             // Send an AJAX request to retrieve the providers for this subscriber
