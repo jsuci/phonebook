@@ -13,8 +13,8 @@
     <tbody>
         @foreach ($data['providers'] as $provider)
             <tr data-id="{{ $provider->id }}" class="provider-row">
-                <td>{{ $provider->phoneno }}</th>
                 <td>{{ $provider->provider }}</td>
+                <td>{{ $provider->phoneno }}</th>
             </tr>
         @endforeach
     </tbody>
@@ -31,7 +31,7 @@
 
         selectedRowId = $(this).data('id');
 
-        console.log(selectedRowId, selectedId)
+        // console.log(selectedRowId, selectedId)
         
     });
     

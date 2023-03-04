@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Subscriber;
+
 use Illuminate\Http\Request;
-use App\Models\SubscriberDetail;
 use Illuminate\Support\Facades\DB;
 
 class PhonebookController extends Controller
@@ -167,6 +165,21 @@ class PhonebookController extends Controller
             ]);
     
         return redirect('/')->with('status', 'Subscriber updated successfully!');
+    }
+
+    public function updateProvider(Request $request, $id)
+    {
+        // $subscriber = DB::table('subscriber_details')->where('id', $id)->first();
+    
+        DB::table('subscriber_details')
+            ->where('id', $id)
+            ->update([
+                'phoneno' => $request->input('phoneno'),
+                'provider' => $request->input('provider'),
+                'updated_at' => now()
+            ]);
+    
+        return redirect('/')->with('status', 'Provider updated successfully!');
     }
 
     

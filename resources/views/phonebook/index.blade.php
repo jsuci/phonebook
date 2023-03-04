@@ -180,11 +180,12 @@
 
           <div class="modal-footer">
             <div class="col-sm-6 text-left">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProviderPhone">Add</button>
-              <button type="button" class="btn btn-secondary" id="deleteProviderBtn">Delete</button>
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProviderPhone">Add</button>
+              <button type="button" class="btn btn-warning" id="editProviderBtn">Edit</button>
+              <button type="button" class="btn btn-danger" id="deleteProviderBtn">Delete</button>
             </div>
             <div class="col-sm-6 text-right">
-              <button type="button" class="btn btn-primary" id="saveProvider">Save changes</button>
+              {{-- <button type="button" class="btn btn-primary" id="saveProvider">Save changes</button> --}}
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
 
@@ -332,17 +333,6 @@
         }
     });
 
-    // // prevButton
-    // $( "#prevButton" ).click(function() {
-    //   // alert( "Previous button clicked." );
-    //   alert( "Previous button clicked." );
-    // });
-
-    // // nextButton
-    // $( "#nextButton" ).click(function() {
-    //   // alert( "Next button clicked." );
-    //   alert( "Next button clicked." );
-    // });
 
     // pagination
     $(document).on('click', '.pagination .page-link', function(event) {
@@ -517,7 +507,6 @@
     });
 
 
-
     // delete provider button
     $('#deleteProviderBtn').click(function() {
         $('tr').removeClass('table-primary');
@@ -555,17 +544,71 @@
     });
 
 
-      $('#inputGender').change(function() {
-        // Get the selected value
-        var selectedValue = $(this).val();
-        
-        // Set the value of the hidden input field based on the selected value
-        if (selectedValue === 'MALE') {
-          $('#gender-input').val('M');
-        } else if (selectedValue === 'FEMALE') {
-          $('#gender-input').val('F');
+    $('#inputGender').change(function() {
+      // Get the selected value
+      var selectedValue = $(this).val();
+      
+      // Set the value of the hidden input field based on the selected value
+      if (selectedValue === 'MALE') {
+        $('#gender-input').val('M');
+      } else if (selectedValue === 'FEMALE') {
+        $('#gender-input').val('F');
+      }
+    });
+
+
+    // edit provider
+    $('#editProviderBtn').click(function() {
+        $('tr').removeClass('table-primary');
+        $(this).toggleClass('table-primary');
+
+        if (selectedRowId) {
+            var selectedProvRow = $('.provider-row[data-id="' + selectedRowId + '"]');
+
+            // Make the row editable
+            selectedProvRow.find('td').attr('contenteditable', true);
+            selectedProvRow.removeClass('table-primary');
+            selectedProvRow.addClass('table-warning');
+
+            selectedProvRow.find('td').on('keydown', function(e) {
+                if (e.which === 13) {
+                    // User pressed the "Enter" key, save changes and make row uneditable
+                    var provider = selectedProvRow.find('td:nth-child(1)').text().trim();
+                    var phoneno = selectedProvRow.find('td:nth-child(2)').text().trim();
+
+
+                    // Call AJAX to save data
+                    $.ajax({
+                        url: '/update-provider/' + selectedRowId,
+                        type: 'POST',
+                        data: {
+                            phoneno: phoneno,
+                            provider: provider,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            // Show success message
+                            notificationToast('alert-success', 'Provider updated successfully!')
+                            console.log('Provider updated successfully!');
+                        },
+                        error: function(response) {
+                            // Show error message
+                            console.log('Error updating provider');
+                            notificationToast('alert-danger', 'Error updating provider')
+                        }
+                    });
+
+                    // Make the row non-editable
+                    selectedProvRow.find('td').attr('contenteditable', false);
+                    selectedProvRow.removeClass('table-warning');
+
+                    // Remove the "contenteditable" attribute from the row's cells
+                    selectedProvRow.find('td').removeAttr('contenteditable');
+
+                }
+            });
         }
-      });
+    });
 
     </script>
 
