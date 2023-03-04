@@ -162,7 +162,8 @@ class PhonebookController extends Controller
                 'middlename' => $request->input('middlename'),
                 'gender' => $request->input('gender'),
                 'address' => $request->input('address'),
-                'updated_at' => now()
+                'updated_at' => now(),
+                'updateddatetime' => now()
             ]);
     
         return redirect('/')->with('status', 'Subscriber updated successfully!');

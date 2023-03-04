@@ -285,9 +285,9 @@
               var address = selectedRow.find('td:nth-child(5)').text().trim();
 
               // Set the value of the hidden input field based on the selected value
-              if (gender === 'MALE') {
+              if (gender.toLowerCase() === 'male') {
                 gender = 'M'
-              } else if (gender === 'FEMALE') {
+              } else if (gender.toLowerCase() === 'female') {
                 gender = 'F'
               }
 
@@ -542,12 +542,12 @@
 
     $('#inputGender').change(function() {
       // Get the selected value
-      var selectedValue = $(this).val();
+      var selectedValue = $(this).val().toLowerCase();
       
       // Set the value of the hidden input field based on the selected value
-      if (selectedValue === 'MALE') {
+      if (selectedValue === 'male') {
         $('#gender-input').val('M');
-      } else if (selectedValue === 'FEMALE') {
+      } else if (selectedValue === 'female') {
         $('#gender-input').val('F');
       }
     });
