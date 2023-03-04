@@ -21,7 +21,7 @@ Route::get('/providers/{id}', [PhonebookController::class, 'showProviders']);
 
 Route::get('/subscribers', [PhonebookController::class, 'showSubscribers']);
 
-Route::get('/search', [PhonebookController::class, 'searchSubscriber']);
+Route::get('/search-subscriber', [PhonebookController::class, 'searchSubscriber']);
 
 Route::post('/add-subscriber', [PhonebookController::class, 'storeSubscriber']);
 

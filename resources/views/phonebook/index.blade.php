@@ -63,7 +63,7 @@
           <div class="searchPrevNext pb-3">
             <div class="row">
               <div class="searchBox col-sm-4 pt-3">
-                  <input type="text" id="searchPerson" class="form-control" placeholder="Search by name">
+                  <input type="text" id="searchPerson" class="form-control" placeholder="Search by name" name="name">
                 </div>
             </div>
           </div>
@@ -345,7 +345,7 @@
           url = $('.pagination .page-item.active .page-link').attr('href');
       }
 
-      // console.log(url)
+      console.log(url)
     
       $.ajax({
           url: url,
@@ -365,11 +365,11 @@
     $('#searchPerson').on('input', function() {
       var searchValue = $(this).val();
 
-      // console.log(searchValue);
+      console.log(searchValue);
 
       // Send AJAX request to fetch filtered data
       $.ajax({
-        url: '/search',
+        url: '/search-subscriber',
         type: 'GET',
         data: { search: searchValue },
         success: function(response) {
@@ -377,6 +377,7 @@
           $('.phoneBook').html(response);
         }
       });
+
     });
 
     // new subscriber form submit

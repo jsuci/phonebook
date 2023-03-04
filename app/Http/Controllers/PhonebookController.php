@@ -142,7 +142,8 @@ class PhonebookController extends Controller
                         })
                         ->where('deleted', 0)
                         ->orderBy('id', 'DESC')
-                        ->paginate(5);
+                        ->paginate(5)
+                        ->appends(['search' => $searchValue]);
                         // ->get();
     
         return view('phonebook.showSubscribers', ['subscribers' => $subscribers]);
