@@ -37,7 +37,7 @@
         <div class="col-sm-4 bg-white leftSide p-5">
 
             <div class="text-center">
-              <img src="https://via.placeholder.com/150" alt="" class="src">
+              <img src="https://i.imgur.com/mbFvwZf.png" alt="" class="src">
             </div>
 
             <div class="subHead pt-5">
@@ -62,19 +62,14 @@
         <div class="col-sm-8 p-5 rightSide">
           <div class="searchPrevNext pb-3">
             <div class="row">
-              <div class="searchBox col-sm-4">
+              <div class="searchBox col-sm-4 pt-3">
                   <input type="text" id="searchPerson" class="form-control" placeholder="Search by name">
-                </div>
-
-                <div class="prevNext col-sm-8 text-right">
-                  <button class="prev btn btn-secondary" id="prevButton">Prev</button>
-                  <button class="nxt btn btn-secondary" id="nextButton">Next</button>
                 </div>
             </div>
           </div>
 
           <div class="phoneBook table">
-            <table class="table" id="subscriberTable">
+            {{-- <table class="table" id="subscriberTable">
               <thead class="thead-light">
                 <tr>
                   <th scope="col">LASTNAME</th>
@@ -87,6 +82,10 @@
               <tbody>
               </tbody>
             </table>
+            <div class="prevNext col-sm-12 text-right pt-3">
+              <button class="prev btn btn-secondary" id="prevButton">Prev</button>
+              <button class="nxt btn btn-secondary" id="nextButton">Next</button>
+            </div> --}}
           </div>
 
 
@@ -240,7 +239,8 @@
         $.ajax({
           url: '/subscribers',
           success: function(data) {
-            $('#subscriberTable > tbody').html(data);
+            // $('#subscriberTable > tbody').html(data);
+            $('.phoneBook').html(data);
           }
         });
 
@@ -332,18 +332,44 @@
         }
     });
 
-    // prevButton
-    $( "#prevButton" ).click(function() {
-      // alert( "Previous button clicked." );
-      alert( "Previous button clicked." );
-    });
+    // // prevButton
+    // $( "#prevButton" ).click(function() {
+    //   // alert( "Previous button clicked." );
+    //   alert( "Previous button clicked." );
+    // });
 
-    // nextButton
-    $( "#nextButton" ).click(function() {
-      // alert( "Next button clicked." );
-      alert( "Next button clicked." );
-    });
+    // // nextButton
+    // $( "#nextButton" ).click(function() {
+    //   // alert( "Next button clicked." );
+    //   alert( "Next button clicked." );
+    // });
 
+    // pagination
+    $(document).on('click', '.pagination .page-link', function(event) {
+      event.preventDefault();
+      
+      var $link = $(this);
+      var url = $link.attr('href');
+    
+      if ($link.attr('rel') == 'prev') {
+          url = $('.pagination .page-item.active .page-link').attr('href');
+      }
+
+      console.log(url)
+    
+      $.ajax({
+          url: url,
+          dataType: 'html',
+          success: function(data) {
+            $('.phoneBook').html(data);
+              // var $newEntries = $(data).find('.entry');
+              // $('.entries').replaceWith($newEntries);
+              
+              // var $newPagination = $(data).find('.pagination');
+              // $('.pagination').replaceWith($newPagination);
+          }
+      });
+    });
 
     // Detect changes to the search input field
     $('#searchPerson').on('input', function() {
@@ -358,7 +384,7 @@
         data: { search: searchValue },
         success: function(response) {
           // Insert search results into table body
-          $('#subscriberTable > tbody').html(response);
+          $('.phoneBook').html(response);
         }
       });
     });
@@ -390,7 +416,8 @@
             type: "GET",
             url: "/subscribers",
             success: function(data) {
-                $('#subscriberTable > tbody').html(data);
+                // $('#subscriberTable > tbody').html(data);
+                $('.phoneBook').html(data);
             },
             error: function(xhr) {
                 console.log(xhr.responseText);
@@ -476,7 +503,8 @@
                     type: "GET",
                     url: "/subscribers",
                     success: function(data) {
-                    $('#subscriberTable > tbody').html(data);
+                      // $('#subscriberTable > tbody').html(data);
+                      $('.phoneBook').html(data);
                     },
                     error: function(xhr) {
                     console.log(xhr.responseText);

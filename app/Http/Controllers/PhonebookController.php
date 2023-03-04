@@ -44,7 +44,8 @@ class PhonebookController extends Controller
         $subscribers = DB::table('subscribers')
                 ->where('deleted', 0)
                 ->orderBy('updateddatetime', 'desc')
-                ->get();
+                ->paginate(5); // 10 records per page
+                // ->get();
         
         return view('phonebook.showSubscribers', [
             'subscribers' => $subscribers
@@ -141,8 +142,10 @@ class PhonebookController extends Controller
                             ->orWhere('gender', 'LIKE', '%'.$searchValue.'%')
                             ->orWhere('address', 'LIKE', '%'.$searchValue.'%');
                         })
+                        ->where('deleted', 0)
                         ->orderBy('id', 'DESC')
-                        ->get();
+                        ->paginate(5);
+                        // ->get();
     
         return view('phonebook.showSubscribers', ['subscribers' => $subscribers]);
     }
