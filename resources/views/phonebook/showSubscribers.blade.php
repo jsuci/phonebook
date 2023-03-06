@@ -35,32 +35,59 @@
 <script>
 
     var selectedId = null;
+    var firstname = null;
+    var lastname = null;
 
     $('.subscriber-row').click(function() {
         $('tr').removeClass('table-primary');
         $(this).toggleClass('table-primary');
 
         selectedId = $(this).data('id');
-        $('#headerid').val(selectedId);
-    });
-
-    $('.subscriber-row').dblclick(function() {
-        $("tr").removeClass('table-primary');
-        $(this).toggleClass('table-primary');
-
-        selectedId = $(this).data('id');
-
-        // console.log(selectedId)
+        firstname = $(this).children('td:nth-child(1)').text().trim();
+        lastname = $(this).children('td:nth-child(2)').text().trim();
 
         // Send an AJAX request to retrieve the providers for this subscriber
         $.ajax({
             url: '/providers/' + selectedId,
             success: function(response) {
                 // Display the providers in a modal
-                $('#providers').modal('show');
-                $('#providers .modal-body').html(response);
+                $('#providers .modal-body table tbody').html(response);
             }
         });
+        
+        // console.log('Selected ID:', selectedId);
+        // console.log('First name:', firstname);
+        // console.log('Last name:', lastname);
+
+        $('#headerid').val(selectedId);
+        $('.modal-body h2').text(firstname + ', ' + lastname);
+
+
+
+    });
+
+    $('.subscriber-row').dblclick(function() {
+        $("tr").removeClass('table-primary');
+        $(this).toggleClass('table-primary');
+
+        // selectedId = $(this).data('id');
+
+        // Wait for 2 seconds before showing the modal
+        setTimeout(function() {
+        $('#providers').modal('show');
+        }, 100);
+        // $('#providers').modal('show');
+
+        // console.log(selectedId)
+
+        // // Send an AJAX request to retrieve the providers for this subscriber
+        // $.ajax({
+        //     url: '/providers/' + selectedId,
+        //     success: function(response) {
+        //         // Display the providers in a modal
+        //         $('#providers .modal-body table tbody').html(response);
+        //     }
+        // });
     });
 
 </script>

@@ -176,6 +176,17 @@
           </div>
 
           <div class="modal-body">
+            <h2></h2>
+            <table class="table pt-3" id="providerTable">
+              <thead class="thead-light">
+                  <tr>
+                      <th scope="col">PROVIDER</th>
+                      <th scope="col">PHONE NO</th>
+                  </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
           </div>
 
           <div class="modal-footer">
@@ -442,7 +453,7 @@
                 type: "GET",
                 url: '/providers/' + selectedId,
                 success: function(data) {
-                    $('#providers .modal-body').html(data);
+                    $('#providers .modal-body table tbody').html(data);
                 },
                 error: function(xhr) {
                     console.log(xhr.responseText);
@@ -454,20 +465,26 @@
     // providers button
     $( "#subProviders" ).click(function() {
         $('#headerid').val(selectedId);
+        $('.modal-body h2').text(firstname + ', ' + lastname);
 
-        if (selectedId) {
-        // Send an AJAX request to retrieve the providers for this subscriber
-        $.ajax({
-            url: '/providers/' + selectedId,
-            success: function(data) {
-            // Display the providers in a modal
-            $('#providers').modal('show');
-            $('#providers .modal-body').html(data);
-            }
-        });
-        } else {
-            notificationToast('alert-danger', 'Please select a subscriber')
+        $('#providers').modal('show');
+
+        if (!selectedId) {
+          notificationToast('alert-danger', 'Please select a subscriber')
         }
+
+    //     if (selectedId) {
+    //     // Send an AJAX request to retrieve the providers for this subscriber
+    //     $.ajax({
+    //         url: '/providers/' + selectedId,
+    //         success: function(data) {
+    //         // Display the providers in a modal
+    //         $('#providers .modal-body table tbody').html(data);
+    //         }
+    //     });
+    //     } else {
+    //         notificationToast('alert-danger', 'Please select a subscriber')
+    //     }
     });
 
 
@@ -526,7 +543,7 @@
                     type: "GET",
                     url: '/providers/' + selectedId,
                     success: function(data) {
-                        $('#providers .modal-body').html(data);
+                        $('#providers .modal-body table tbody').html(data);
                     },
                     error: function(xhr) {
                         console.log(xhr.responseText);

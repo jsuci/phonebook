@@ -15,25 +15,42 @@ class PhonebookController extends Controller
 
     public function showProviders($id)
     {
-        // Retrieve the subscriber with the given ID
-        $subscriber = DB::table('subscribers')->where('id', $id)->where('deleted', 0)->first();
 
-        // Retrieve all the providers linked to the subscriber
-        $providers = DB::table('subscriber_details')
-                ->where('headerid', $id)
-                ->where('deleted', 0)
-                ->orderBy('updated_at', 'desc')
-                ->get();
+        $results = DB::table('subscribers')
+        ->join('subscriber_details', 'subscribers.id', '=', 'subscriber_details.headerid')
+        ->where('subscribers.id', $id)
+        ->where('subscribers.deleted', 0)
+        ->where('subscriber_details.deleted', 0)
+        ->select('subscribers.id',
+        'subscribers.firstname',
+        'subscribers.lastname', 'subscriber_details.id',
+        'subscriber_details.phoneno', 'subscriber_details.provider')
+        
+        ->get();
+
+        dd($results);
+
+        // return $results;
+
+        // // Retrieve the subscriber with the given ID
+        // $subscriber = DB::table('subscribers')->where('id', $id)->where('deleted', 0)->first();
+
+        // // Retrieve all the providers linked to the subscriber
+        // $providers = DB::table('subscriber_details')
+        //         ->where('headerid', $id)
+        //         ->where('deleted', 0)
+        //         ->orderBy('updated_at', 'desc')
+        //         ->get();
 
 
-        // Pass the data to the view
-        $data = [
-            'subscriber' => $subscriber,
-            'providers' => $providers
-        ];
+        // // Pass the data to the view
+        // $data = [
+        //     'subscriber' => $subscriber,
+        //     'providers' => $providers
+        // ];
 
         return view('phonebook.showProviders', [
-            'data' => $data
+            'results' => $results
         ]);
     }
 
