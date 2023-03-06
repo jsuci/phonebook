@@ -28,7 +28,7 @@ class PhonebookController extends Controller
         
         ->get();
 
-        dd($results);
+        // dd($results);
 
         // return $results;
 
