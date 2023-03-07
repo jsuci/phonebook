@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\Debugbar\Facades\Debugbar;
 
 class PhonebookController extends Controller
 {
@@ -27,6 +28,8 @@ class PhonebookController extends Controller
         'subscriber_details.phoneno', 'subscriber_details.provider')
         
         ->get();
+
+        // Debugbar::info($results);
 
         // dd($results);
 
@@ -59,8 +62,10 @@ class PhonebookController extends Controller
         $subscribers = DB::table('subscribers')
                 ->where('deleted', 0)
                 ->orderBy('updateddatetime', 'desc')
-                ->paginate(5); // 10 records per page
+                ->paginate(5); // 5 records per page
                 // ->get();
+
+        Debugbar::info($subscribers);
         
         return view('phonebook.showSubscribers', [
             'subscribers' => $subscribers

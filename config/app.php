@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Facade;
 
 return [
 
+    'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
+
     /*
     |--------------------------------------------------------------------------
     | Application Name

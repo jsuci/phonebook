@@ -3,7 +3,7 @@
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- <meta name="csrf-token" content="{{ csrf_token() }}"> --}}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
@@ -467,10 +467,10 @@
         $('#headerid').val(selectedId);
         $('.modal-body h2').text(firstname + ', ' + lastname);
 
-        $('#providers').modal('show');
-
         if (!selectedId) {
           notificationToast('alert-danger', 'Please select a subscriber')
+        } else {
+          $('#providers').modal('show');
         }
 
     //     if (selectedId) {
