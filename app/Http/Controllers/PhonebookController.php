@@ -65,7 +65,7 @@ class PhonebookController extends Controller
                 ->paginate(5); // 5 records per page
                 // ->get();
 
-        Debugbar::info($subscribers);
+        // Debugbar::info($subscribers);
         
         return view('phonebook.showSubscribers', [
             'subscribers' => $subscribers
